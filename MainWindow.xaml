@@ -1,0 +1,34 @@
+﻿<Window x:Class="SM_Rating_Scale_Converter.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SM_Rating_Scale_Converter"
+        mc:Ignorable="d"
+        Title="SM Rating Scale Converter" Height="893.379" Width="796.14">
+    <Grid Margin="0,0,2,0">
+        <Button x:Name="buttonOpen" Content="Open Folder..." HorizontalAlignment="Left" Margin="407,50,0,0" VerticalAlignment="Top" Width="94" Height="70" FontSize="14" Click="buttonOpen_Click"/>
+        <Label Content="48's Simfile Rating Scale Converter" Margin="10,10,10,0" VerticalAlignment="Top" FontSize="18" FontWeight="Bold" HorizontalAlignment="Left"/>
+        <Label Content="Convert Stepmania simfiles between Old and X scales!&#xD;&#xA;Supports: SM or DWI files, chart-by-chart or batch conversions&#xD;&#xA;Enjoy! :D" HorizontalAlignment="Left" Margin="10,49,0,0" VerticalAlignment="Top" FontSize="14"/>
+        <Button x:Name="buttonConvertAllOld" Content="Convert all to Old Scale" Margin="506,50,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="155" Click="buttonConvertAllOld_Click"/>
+        <Button x:Name="buttonConvertAllKeep" Content="Keep all scales (No change)" Margin="506,75,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="155" Click="buttonConvertAllKeep_Click"/>
+        <Button x:Name="buttonConvertAllX" Content="Convert all to X Scale" Margin="506,100,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="155" Click="buttonConvertAllX_Click"/>
+        <Button x:Name="buttonSave" Content="Save Changes..." Margin="666,49,0,0" VerticalAlignment="Top" Height="70" FontSize="14" HorizontalAlignment="Left" Width="110" Click="buttonSave_Click"/>
+        <ScrollViewer HorizontalAlignment="Left" Margin="10,125,0,0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" CanContentScroll="True" Width="766">
+            <Grid x:Name="gridSimfiles" ShowGridLines="True" Width="744" VerticalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="160*"/>
+                    <ColumnDefinition Width="40*"/>
+                    <ColumnDefinition Width="40*"/>
+                    <ColumnDefinition Width="40*"/>
+                    <ColumnDefinition Width="40*"/>
+                    <ColumnDefinition Width="40*"/>
+                    <ColumnDefinition Width="45*"/>
+                    <ColumnDefinition Width="45*"/>
+                    <ColumnDefinition Width="45*"/>
+                </Grid.ColumnDefinitions>
+            </Grid>
+        </ScrollViewer>
+
+    </Grid>
+</Window>
