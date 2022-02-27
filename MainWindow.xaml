@@ -13,7 +13,7 @@
         <Button x:Name="buttonConvertAllOld" Content="Convert all to Old Scale" Margin="506,50,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="155" Click="buttonConvertAllOld_Click"/>
         <Button x:Name="buttonConvertAllKeep" Content="Keep all scales (No change)" Margin="506,75,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="155" Click="buttonConvertAllKeep_Click"/>
         <Button x:Name="buttonConvertAllX" Content="Convert all to X Scale" Margin="506,100,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="155" Click="buttonConvertAllX_Click"/>
-        <Button x:Name="buttonSave" Content="Save Changes..." Margin="666,49,0,0" VerticalAlignment="Top" Height="70" FontSize="14" HorizontalAlignment="Left" Width="110" Click="buttonSave_Click"/>
+        <Button x:Name="buttonSave" Content="Save Changes..." Margin="666,49,0,0" VerticalAlignment="Top" Height="33" FontSize="14" HorizontalAlignment="Left" Width="110" Click="buttonSave_Click"/>
         <ScrollViewer HorizontalAlignment="Left" Margin="10,125,0,0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" CanContentScroll="True" Width="766">
             <Grid x:Name="gridSimfiles" ShowGridLines="True" Width="744" VerticalAlignment="Stretch">
                 <Grid.ColumnDefinitions>
@@ -29,6 +29,7 @@
                 </Grid.ColumnDefinitions>
             </Grid>
         </ScrollViewer>
+        <Button x:Name="buttonExport" Content="Export Chart Data..." Margin="666,87,0,0" VerticalAlignment="Top" Height="34" FontSize="14" HorizontalAlignment="Left" Width="110" Click="buttonExport_Click"/>
 
     </Grid>
 </Window>

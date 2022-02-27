@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -220,6 +223,30 @@ namespace SM_Rating_Scale_Converter
         {
             MessageBoxResult result = MessageBox.Show("You must reload the current group or load a new group to make any new changes.\n\nReload now?", "Reload? - SM Rating Scale Converter", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result == MessageBoxResult.Yes) { loadGroup(); }
+        }
+
+        private void buttonExport_Click(object sender, RoutedEventArgs e)
+        {
+            CommonSaveFileDialog dialogExportData = new CommonSaveFileDialog
+            {
+                Title = "Save exported data to...",
+                DefaultFileName = "songdata.json",
+            };
+
+            if (dialogExportData.ShowDialog() != CommonFileDialogResult.Ok)
+            {
+                return; // It's TIME to STOP! NO MORE!
+            }
+
+            List<DDRCardDrawDataSong> songs = new List<DDRCardDrawDataSong>();
+            foreach (Simfile file in simfiles)
+            {
+                songs.Add(DDRCardDrawData.simfileToCardDrawSong(file));
+            }
+
+            string data = JsonConvert.SerializeObject(songs);
+            File.WriteAllText(dialogExportData.FileName, data);
+
         }
     }
 }
