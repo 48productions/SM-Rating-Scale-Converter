@@ -29,8 +29,21 @@ namespace SM_Rating_Scale_Converter
                 return simfiles; //User hit cancel, let's not load any simfiles
             }
 
+            //Get all SSC simfiles in the selected directory and parse them
+            string[] simfilePaths = Directory.GetFiles(dialogOpenFolder.FileName, "*.ssc", SearchOption.AllDirectories);
+            foreach (string simfilePath in simfilePaths) {
+                Simfile simfile = Simfile.ParseSimfileSSC(simfilePath);
+                if (simfileNames.Contains(simfile.Name)) { //If a file with the same name has been loaded before, don't add it to the simfile list
+                    duplicateCount++;
+                    Console.WriteLine("Duplicate SSC file: " + simfile.Name);
+                } else { //Otherwise, add the simfile to the list
+                    simfiles.Add(simfile);
+                    simfileNames.Add(simfile.Name);
+                }
+            }
+
             //Get all SM simfiles in the selected directory and parse them
-            string[] simfilePaths = Directory.GetFiles(dialogOpenFolder.FileName, "*.sm", SearchOption.AllDirectories);
+            simfilePaths = Directory.GetFiles(dialogOpenFolder.FileName, "*.sm", SearchOption.AllDirectories);
             foreach (string simfilePath in simfilePaths)
             {
                 Simfile simfile = Simfile.ParseSimfileSM(simfilePath);
@@ -85,8 +98,10 @@ namespace SM_Rating_Scale_Converter
                         continue;
                 }
 
-                if (simfile.Path.Substring(simfile.Path.Length - 3).Equals(".sm", StringComparison.CurrentCultureIgnoreCase))
-                {
+                //Console.WriteLine(simfile.Path + "," + simfile.Path.Substring(simfile.Path.Length - 3));
+                if (simfile.Path.Substring(simfile.Path.Length - 4).Equals(".ssc", StringComparison.CurrentCultureIgnoreCase)) {
+                    Simfile.SaveSimfileSSC(simfile);
+                } else if (simfile.Path.Substring(simfile.Path.Length - 3).Equals(".sm", StringComparison.CurrentCultureIgnoreCase)) {
                     Simfile.SaveSimfileSM(simfile);
                 } else if (simfile.Path.Substring(simfile.Path.Length - 4).Equals(".dwi", StringComparison.CurrentCultureIgnoreCase)) {
                     Simfile.SaveSimfileDWI(simfile);

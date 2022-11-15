@@ -166,6 +166,9 @@ namespace SM_Rating_Scale_Converter
             {
                 radiobutton.IsChecked = true;
             }
+            foreach (Simfile simfile in simfiles) {
+                simfile.ScaleChange = RatingScaleChange.ToOld;
+            }
         }
 
         private void buttonConvertAllKeep_Click(object sender, RoutedEventArgs e)
@@ -176,6 +179,9 @@ namespace SM_Rating_Scale_Converter
             {
                 radiobutton.IsChecked = true;
             }
+            foreach (Simfile simfile in simfiles) {
+                simfile.ScaleChange = RatingScaleChange.NoChange;
+            }
         }
 
         private void buttonConvertAllX_Click(object sender, RoutedEventArgs e)
@@ -185,6 +191,9 @@ namespace SM_Rating_Scale_Converter
             foreach (RadioButton radiobutton in rbsToX)
             {
                 radiobutton.IsChecked = true;
+            }
+            foreach (Simfile simfile in simfiles) {
+                simfile.ScaleChange = RatingScaleChange.ToX;
             }
         }
 

@@ -19,6 +19,7 @@ namespace SM_Rating_Scale_Converter
         ANOTHER,
         MANIAC,
         SMANIAC,
+        Challenge, // SSC Difficulties
         Edit, //Edit (default-ish)
     }
 
@@ -47,6 +48,96 @@ namespace SM_Rating_Scale_Converter
         public RatingScaleChange ScaleChange { get; set; }
 
         public string Path { get; set; }
+
+        //Parse a .SSC simfile for stepcharts
+        public static Simfile ParseSimfileSSC(string path) {
+            Console.WriteLine("Parsing SSC simfile: " + path);
+            Simfile simfile = new Simfile();
+            simfile.Path = path;
+
+            StepChart curChart = new StepChart(StepDifficulty.Edit, 0, null);
+
+            string[] lines = File.ReadAllLines(path);
+            for (int i = 0; i <= lines.Length - 1; i++) {
+                string line = lines[i];
+
+                //Console.WriteLine(line);
+
+                if (line.Contains("#TITLE:")) {
+                    simfile.Name = line.Substring(7, line.Length - 8); //Read everything after "#TITLE:" to the end of the line (minus the ;, so len = - 7 - 1)
+                    Console.WriteLine("Found name: " + simfile.Name);
+                } else if (line.Contains("#ARTIST:")) {
+                    simfile.Artist = line.Substring(8, line.Length - 9);
+
+                } else if (line.Contains("#TITLETRANSLIT:")) {
+                    simfile.NameTranslit = line.Substring(15, line.Length - 16);
+
+                } else if (line.Contains("#ARTISTTRANSLIT:")) {
+                    simfile.ArtistTranslit = line.Substring(16, line.Length - 17);
+                } else if (line.Contains("#BPMS:")) {
+                    // Parse BPMs from an SSC-formatted BPM string: #BPMS:x=y,x=y,...; Position=value,
+                    int bpmPos = 0;
+                    int bpmEndPos = 0;
+                    float bpmLow = -1;
+                    float bpmHigh = 0;
+                    while (true) {
+                        bpmPos = line.IndexOf('=', bpmPos); // Find the next = in the BPM list for the start of this BPM entry, starting from where the last one was found
+                        if (bpmPos < 0) { // If IndexOf returns -1, there's no more BPMs on this line.
+                            if (line.IndexOf(';') == -1) // If an end ; isn't on this line, the BPM segment may continue onto the next line...
+                            {
+                                i++; // So start looking on the next line and continue searching.
+                                line = lines[i];
+                                bpmPos = 0; bpmEndPos = 0;
+                                continue;
+                            } else { break; }
+                        }
+                        bpmEndPos = line.IndexOfAny(new char[] { ',', ';' }, bpmPos) - 1; // Find the next , or ; in the BPM list for the end of this BPM
+                        if (bpmEndPos < 0) { bpmEndPos = line.Length - 1; } // SM sometimes places ; on a newline, so if we fail to find a ;, it's probably just the last BPM in the chain
+
+                        // Parse the BPM out of the string, if it's outside our found max/min values, record it
+                        float bpm;
+                        try {
+                            Console.WriteLine(line.Substring(bpmPos + 1, bpmEndPos - bpmPos));
+                            bpm = (float)Double.Parse(line.Substring(bpmPos + 1, bpmEndPos - bpmPos));
+                        } catch (FormatException e) { Console.WriteLine("BPM formatting error!"); break; }
+
+                        if (bpmLow == -1 || bpm < bpmLow) { bpmLow = bpm; }
+                        if (bpm > bpmHigh) { bpmHigh = bpm; }
+
+                        bpmPos = bpmEndPos; // Start looking for the next BPM after the end of this one
+                    }
+                    if (bpmLow == bpmHigh) { simfile.BPM = bpmLow.ToString(); } else { simfile.BPM = bpmLow.ToString() + "-" + bpmHigh.ToString(); }
+                } else if (line.Contains("#DISPLAYBPM:")) {
+                    simfile.BPM = line.Substring(12, line.Length - 13);
+
+                } else if (line.Contains("#NOTEDATA:")) {
+                    Console.WriteLine("Found notedata section!");
+                    if (curChart.Style != null) {
+                        simfile.StepCharts.Add(curChart);
+                        curChart = new StepChart(StepDifficulty.Edit, 0, null);
+                    }
+                } else if (line.Contains("#STEPSTYPE:")) {
+                    string styleLine = line.Substring(11, line.Length - 12);
+                    Console.WriteLine("Style: " + styleLine);
+                    curChart.Style = styleLine;
+
+                } else if (line.Contains("#DIFFICULTY:")) {
+                    string difficultyLine = line.Substring(12, line.Length - 13);
+                    Console.WriteLine("Difficulty: " + difficultyLine);
+
+                    StepDifficulty difficulty;
+                    if (!Enum.TryParse(difficultyLine, true, out difficulty)) difficulty = StepDifficulty.Edit; //Try parsing the difficulty line - if there's a valid difficulty there, use it. If not, call it an Edit difficulty.
+                    curChart.ChartDifficulty = difficulty;
+
+                } else if (line.Contains("#METER:")) {
+                    string ratingLine = line.Substring(7, line.Length - 8);
+                    Console.WriteLine("Rating: " + ratingLine);
+                    curChart.Rating = Int32.Parse(ratingLine);
+                }
+            }
+            simfile.StepCharts.Add(curChart);
+            return simfile;
+        }
 
 
         //Parse a .SSC simfile for stepcharts
@@ -301,6 +392,29 @@ namespace SM_Rating_Scale_Converter
 
 
 
+        //Modify a SSC format simfile with new step ratings
+        public static void SaveSimfileSSC(Simfile simfile) {
+            Console.WriteLine("Writing SSC " + simfile.Path);
+            string[] lines = File.ReadAllLines(simfile.Path);
+
+            int chartIndex = 0;
+
+            for (int i = 0; i <= lines.Length - 1; i++) {
+                //Console.WriteLine(line);
+
+                if (lines[i].Contains("#METER:")) {
+                    lines[i] = "#METER:" + simfile.StepCharts[chartIndex].Rating + ";"; //Write the new rating line
+                    Console.WriteLine("New chart rating: " + simfile.StepCharts[chartIndex].Rating);
+
+                    chartIndex++; //Move onto the next chart index for the next chart
+                }
+            }
+
+            File.WriteAllLines(simfile.Path, lines);
+        }
+
+
+
         //Modify a SM format simfile with new step ratings
         public static void SaveSimfileSM(Simfile simfile)
         {
@@ -376,6 +490,7 @@ namespace SM_Rating_Scale_Converter
                     return Brushes.DarkRed;
                 case StepDifficulty.Expert:
                 case StepDifficulty.SMANIAC:
+                case StepDifficulty.Challenge:
                     return Brushes.Purple;
                 default:
                     return Brushes.DarkSlateGray;
